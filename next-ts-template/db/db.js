@@ -4,8 +4,8 @@ import mysql from 'mysql2';
 const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: 'root',
-  database: 'line_db'
+  password: 'NatsukiHijiri2434',
+  database: 'prisma_db'
 });
 
 export default connection;

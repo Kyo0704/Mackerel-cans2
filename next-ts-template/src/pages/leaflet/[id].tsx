@@ -1,8 +1,8 @@
 import { query } from '@/../db/query';
 import styles from '/styles/leaflet_index.module.scss'
 
-function Post({ liff , liffError, data, err }) {
-
+function Post({ liff , liffError, data, err }:any) {
+  
   const table_title = {
     p_name: "商品名",
     p_id: "ID",
@@ -69,7 +69,7 @@ function Post({ liff , liffError, data, err }) {
 
 export async function getStaticPaths() {
   const results = await query('SELECT sid FROM store');
-
+  console.log(results)
   const paths = results.map((e: { sid: { toString: () => any; }; }) => ({
     params: { id: e.sid.toString() }
   }));
