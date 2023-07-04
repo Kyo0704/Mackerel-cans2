@@ -20,7 +20,7 @@ model User {
 model Product {
   pid         String @id @db.VarChar(255) @default(cuid())
   pname       String @db.VarChar(255)
-  expiry_date DateTime?
+  expiry_date DateTime
   price       Int?
   image       String? @db.VarChar(255)
   states      State[]
