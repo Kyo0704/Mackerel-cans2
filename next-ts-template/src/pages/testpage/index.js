@@ -1,16 +1,36 @@
 import { useEffect, useState } from "react"
 
-export default function Home({ liff, liffError, token }) {
+export default function Home() {
+  const [liffObject, setLiffObject] = useState(null);
+  const [liffError, setLiffError] = useState(null);
+  const [liffToken, setLiffToken] = useState(null);
+
   const [userData, setUserData] = useState()
   let result
 
   useEffect(() => {
+    // to avoid `window is not defined` error
+    (async () => {
+      const liff = (await import("@line/liff")).default;
+      liff
+        .init({ liffId: "2000097840-5YWOex9P" })
+        .then(() => {
+          const token = liff.getAccessToken();
+          console.log("LIFF init succeeded.");
+          setLiffToken(token)
+          setLiffObject(liff);
+        })
+        .catch((error) => {
+          console.log("LIFF init failed.");
+          setLiffError(error.toString());
+        });
+    })()
     getUserData()
   }, [])
 
   // ユーザーデータの取得
   const getUserData = async () => {
-    const data = { token: token }
+    const data = { token: liffToken }
     const response = await fetch('/api/getUserData', {
       method: 'POST',
       headers: {
@@ -25,8 +45,11 @@ export default function Home({ liff, liffError, token }) {
   const DisplayUser = () => {
     if (userData) {
       return (
-        <div>userData : {userData.message}</div>
-        // <div>userData : {userData.userId}</div>
+        <>
+          <div>userData : {userData.message}</div>
+          <div>userId : {userData.userId}</div>
+          <div>userName : {userData.displayName}</div>
+        </>
       )
     } else {
       return (
@@ -36,14 +59,14 @@ export default function Home({ liff, liffError, token }) {
   }
 
   const DisplayLiff = () => {
-    if (liff) {
+    if (liffObject) {
       return (
         <div>
           LIFFがあります。
         </div>
       )
-    }else{
-      return(
+    } else {
+      return (
         <div>
           LIFFがありません。
         </div>
@@ -55,7 +78,7 @@ export default function Home({ liff, liffError, token }) {
     <div>
       <div><DisplayLiff /></div>
       <div>liffError : {liffError}</div>
-      <div>accessToken : {token}</div>
+      <div>accessToken : {liffToken}</div>
       <div><DisplayUser /></div>
     </div>
   )
