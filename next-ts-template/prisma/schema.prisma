@@ -12,9 +12,14 @@ datasource db {
 
 model User {
   uid    String @id @db.VarChar(255) @default(cuid())
-  lineId String? @unique @db.VarChar(255)
   uname   String? @db.VarChar(255) 
   registeredStore RegisteredStore[]
+}
+
+model Classification {
+  gid String @id @default(cuid())
+  gname String
+  products  Product[]
 }
 
 model Product {
@@ -23,6 +28,10 @@ model Product {
   expiry_date DateTime?
   price       Int?
   image       String? @db.VarChar(255)
+  gid            String
+  production_area String?
+  volume         String?
+  classification        Classification    @relation(fields: [gid], references: [gid])
   states      State[]
   discounts   Discount[]
 }
@@ -30,19 +39,18 @@ model Product {
 model Store {
   sid         String @id @db.VarChar(255)
   sname       String @db.VarChar(255)
-  url         String? @db.VarChar(255)
   discounts   Discount[]
   registeredStore RegisteredStore[]
   employees Employee[]
 }
 
 model State {
-  stid        String @id @unique @db.VarChar(255)
+  stid        String @unique @db.VarChar(255)
   pid         String @db.VarChar(255)
   stname      String @db.VarChar(255)
+  @@id([stid, pid])
   product     Product @relation(fields: [pid], references: [pid])
   discounts   Discount[]
-  @@unique([stid, pid])
 }
 
 model Discount {
@@ -50,7 +58,9 @@ model Discount {
   number      Int
   pid         String
   sid         String
+  quantity    Int 
   stid        String
+  @@map("Discount")
   product     Product @relation(fields: [pid], references: [pid])
   store       Store   @relation(fields: [sid], references: [sid])
   state       State   @relation(fields: [stid], references: [stid])
@@ -60,7 +70,6 @@ model Discount {
 model RegisteredStore {
   uid    String @db.VarChar(255)
   sid    String @db.VarChar(255)
-  rname  String @db.VarChar(255)
   user   User   @relation(fields: [uid], references: [uid])
   store  Store  @relation(fields: [sid], references: [sid])
   @@id([uid, sid])
@@ -71,6 +80,7 @@ model Employee {
   ename String @db.VarChar(255)
   sid String @db.VarChar(255)
   jid String @db.VarChar(255)
+  pass String @db.VarChar(255)
   store Store @relation(fields: [sid], references: [sid])
   job Job @relation(fields: [jid], references: [jid])
 }
