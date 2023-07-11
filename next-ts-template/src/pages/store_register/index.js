@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 import { query } from "../../../db/query"
 
-
 export default function index({ liff, liffError, token, store_data, registered_data, err }) {
   const [storeData, setStoreData] = useState("")
   const [selectData, setSelectData] = useState("")
@@ -32,7 +31,6 @@ export default function index({ liff, liffError, token, store_data, registered_d
 
       if (response.ok) {
         const result = await response.json();
-        console.log(result)
       } else {
         setInsertError(true)
         console.error('データの挿入中にエラーが発生しました。');
@@ -66,12 +64,12 @@ export default function index({ liff, liffError, token, store_data, registered_d
       } else {
         return (
           <div>
-            <select name="store_register" id="store_register">
+            <Select name="store_register" id="store_register">
               {store_data.map((store) => (
                 <option key={store.sid} id={store.sid} value={store.sname}>{store.sname}</option>
               ))}
-            </select>
-            <button variant = "contained" id='checkButton' onClick={buttonClick}>登録</button>
+            </Select>
+            <button variant="contained" id='checkButton' onClick={buttonClick}>登録</button>
           </div>
         )
       }
@@ -90,7 +88,7 @@ export default function index({ liff, liffError, token, store_data, registered_d
 
   const Display_BackButton = () => {
     if (isSelected == true) {
-      return(
+      return (
         <button id='checkButton' onClick={buttonClick_back}>戻る</button>
       )
     }
@@ -111,17 +109,17 @@ export default function index({ liff, liffError, token, store_data, registered_d
         </div>
       )
     }
-  } else if(!liff){
+  } else if (!liff) {
     return (
       <div>
         <p>エラーが発生しました。</p>
         <p>{liffError}</p>
       </div>
     )
-  } else if(!token){
-    return(
+  } else if (!token) {
+    return (
       <div>
-        ユーザー情報が取得できませんでした。
+        ユーザー情報を取得できませんでした。
       </div>
     )
   }
@@ -133,7 +131,7 @@ export async function getStaticProps() {
      * sql文を作成
      * store表　sname sid
      */
-    const sql_store = "select sname,sid from store";
+    const sql_store = "select sname,sid from Store";
 
     // idを使って必要なデータを取得するなどの処理を行う
     const result_store = await query(sql_store)

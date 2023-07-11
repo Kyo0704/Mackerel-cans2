@@ -3,7 +3,6 @@ import connection from '../../../db/db';
 export default async function handler(req, res) {
   // POSTリクエストのボディからデータを取得
   const { data } = req.body;
-  console.log({data})
 
   const response = await fetch('https://api.line.me/v2/profile', {
     headers: {
@@ -11,9 +10,10 @@ export default async function handler(req, res) {
     }
   });
   const profile = await response.json();
+  
 
   // データを挿入するためのクエリを作成
-  const query = `INSERT INTO Registered_stores VALUES ('${profile.userId}','${data.sid}','hogehoge')`;
+  const query = `INSERT INTO User VALUES ('${profile.userId}','${profile.displayName}')`;
 
   // データベースにデータを挿入
   connection.query(query, (error, results, fields) => {
