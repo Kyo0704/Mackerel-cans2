@@ -7,6 +7,7 @@ export default function Home() {
 
   const [userData, setUserData] = useState()
   let result
+  let token
 
   useEffect(() => {
     // to avoid `window is not defined` error
@@ -15,22 +16,22 @@ export default function Home() {
       liff
         .init({ liffId: "2000097840-5YWOex9P" })
         .then(() => {
-          const token = liff.getAccessToken();
+          token = liff.getAccessToken();
           console.log("LIFF init succeeded.");
           setLiffToken(token)
           setLiffObject(liff);
+          getUserData()
         })
         .catch((error) => {
           console.log("LIFF init failed.");
           setLiffError(error.toString());
         });
     })()
-    getUserData()
   }, [])
 
   // ユーザーデータの取得
   const getUserData = async () => {
-    const data = { token: liffToken }
+    const data = { token: token }
     const response = await fetch('/api/getUserData', {
       method: 'POST',
       headers: {
