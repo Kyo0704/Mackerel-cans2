@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react"
-import { query } from "../../../db/query"
-import styles from "../../../styles/registerStore.module.scss"
+import { useEffect, useState } from "react"
+import styles from "../../../styles/removeStore.module.scss"
 
-export default function index({ store_data, err }) {
+export default function Home() {
   const [liffObject, setLiffObject] = useState("");
   const [liffError, setLiffError] = useState("");
   const [liffToken, setLiffToken] = useState("");
@@ -11,12 +10,13 @@ export default function index({ store_data, err }) {
   const [selectData, setSelectData] = useState("");
   const [selectedOptionId, setSelectedOptionId] = useState("");
   const [isSelected, setIsSelected] = useState(false);
-  const [insertError, setInsertError] = useState(false);
+  const [removeError, setRemoveError] = useState(false)
 
-  let optionId
-  let selectedOption
   let result
   let token
+  let storeResult
+  let optionId
+  let selectedOption
 
   useEffect(() => {
     /************************************************************** */
@@ -35,13 +35,14 @@ export default function index({ store_data, err }) {
     (async () => {
       const liff = (await import("@line/liff")).default;
       liff
-        .init({ liffId: "2000040298-43n1RAkK" })
-        .then(() => {
+        .init({ liffId: "2000107333-BamRaAmA" })
+        .then(async () => {
           token = liff.getAccessToken();
-          console.log("LIFF init succeeded.");         
+          console.log("LIFF init succeeded.");
           setLiffToken(token)
           setLiffObject(liff);
-          getUserData()
+          await getUserData()
+          await getStoreData()
         })
         .catch((error) => {
           console.log("LIFF init failed.");
@@ -49,6 +50,7 @@ export default function index({ store_data, err }) {
         });
     })()
   }, []);
+
 
   // ユーザーデータの取得
   const getUserData = async () => {
@@ -64,10 +66,23 @@ export default function index({ store_data, err }) {
     setUserData(result)
   }
 
-  const insertData = async () => {
+  const getStoreData = async () => {
+    const data = { userId: result.userId }
+    const response = await fetch('/api/getStoreData', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ data }),
+    });
+    storeResult = await response.json()
+    setStoreData(storeResult)
+  }
+
+  const removeData = async () => {
     try {
       const data = { sid: optionId, userId: userData.userId }
-      const response = await fetch('/api/insert_storeRegister', {
+      const response = await fetch('/api/removeStore', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,11 +93,11 @@ export default function index({ store_data, err }) {
       if (response.ok) {
         const result = await response.json();
       } else {
-        setInsertError(true)
+        setRemoveError(true)
         console.error('データの挿入中にエラーが発生しました。');
       }
     } catch (error) {
-      setInsertError(true)
+      setRemoveError(true)
       console.error(error);
     }
   }
@@ -95,7 +110,7 @@ export default function index({ store_data, err }) {
 
     setSelectData(selectedOption.value);
     setSelectedOptionId(optionId);
-    insertData();
+    removeData();
   }
 
   function buttonClick_back() {
@@ -104,7 +119,7 @@ export default function index({ store_data, err }) {
 
   const Display_select = () => {
     if (!isSelected) {
-      if (store_data.length == 0) {
+      if (storeData.length == 0) {
         return (
           <div className={styles.title}>店舗情報がありません。</div>
         )
@@ -112,26 +127,26 @@ export default function index({ store_data, err }) {
         return (
           <div className={styles.title}>
             <div>
-              登録する店舗を選択してください。
+              登録解除する店舗を選択してください。
             </div>
             <select className={styles.select} name="store_register" id="store_register">
-              {store_data.map((store) => (
+              {storeData.data.map((store) => (
                 <option key={store.sid} id={store.sid} value={store.sname}>{store.sname}</option>
               ))}
             </select>
             <div>
-              <button className={styles.button} variant="contained" id='checkButton' onClick={buttonClick}>登録</button>
+              <button className={styles.button} variant="contained" id='checkButton' onClick={buttonClick}>登録解除</button>
             </div>
           </div>
         )
       }
-    } else if (insertError == false) {
+    } else if (removeError == false) {
       return (
         <div className={styles.title}>
-          {selectData}を登録しました。
+          {selectData}を登録解除しました。
         </div>
       )
-    } else if (insertError == true) {
+    } else if (removeError == true) {
       return (
         <div className={styles.title}>データベースに登録できませんでした。</div>
       )
@@ -142,7 +157,7 @@ export default function index({ store_data, err }) {
     if (isSelected == true) {
       return (
         <div className={styles.title}>
-        <button className={styles.button} id='checkButton' onClick={buttonClick_back}>戻る</button>
+          <button className={styles.button} id='checkButton' onClick={buttonClick_back}>戻る</button>
         </div>
       )
     }
@@ -150,7 +165,7 @@ export default function index({ store_data, err }) {
 
   const Display = () => {
     if (liffObject && liffToken) {
-      if (!err) {
+      if (storeData) {
         return (
           <div className={styles.title}>
             <Display_select />
@@ -180,35 +195,13 @@ export default function index({ store_data, err }) {
     }
   }
 
-  return(
+  return (
     <div className={styles.title}>
       <Display />
-      <a href="https://liff.line.me/2000107333-BamRaAmA">
-        <button className={styles.button}>店舗登録解除ページへ</button>
+      <a href="https://liff.line.me/2000040298-43n1RAkK">
+        <button className={styles.button}>店舗登録ページへ</button>
       </a>
     </div>
   )
-  
-}
 
-export async function getStaticProps() {
-  try {
-    const sql_store = "select sname,sid from Store";
-
-    // idを使って必要なデータを取得するなどの処理を行う
-    const result_store = await query(sql_store)
-    return {
-      props: {
-        store_data: result_store,
-        err: false
-      }
-    };
-  } catch (error) {
-    return {
-      props: {
-        store_data: null,
-        err: true
-      }
-    };
-  }
 }
