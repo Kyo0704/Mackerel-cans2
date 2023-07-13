@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { query } from "../../../db/query"
 import styles from "../../../styles/registerStore.module.scss"
 
-export default function index({ store_data, err }) {
+export default function Home({ store_data, err }) {
   const [liffObject, setLiffObject] = useState("");
   const [liffError, setLiffError] = useState("");
   const [liffToken, setLiffToken] = useState("");
@@ -76,6 +76,7 @@ export default function index({ store_data, err }) {
       });
 
       if (response.ok) {
+        setInsertError(false)
         const result = await response.json();
       } else {
         setInsertError(true)

@@ -1,6 +1,8 @@
-import connection from '../../../db/db';
+import mysql from 'mysql2'
+import db_setting from '../../../db/db'
 
 export default async function handler(req, res) {
+  const connection = mysql.createConnection(db_setting);
   try {
     // POSTリクエストのボディからデータを取得
     const { data } = req.body;
@@ -14,12 +16,13 @@ export default async function handler(req, res) {
       if (error) {
         console.error(error);
         await res.status(500).json({ error: 'データの挿入中にエラーが発生しました。' });
-        connection.end();
       } else {
-        res.status(200).json({ data: results });
+        await res.status(200).json({ data: results });
       }
     });
   } catch (error) {
-    res.status(500).json({ error: 'データの挿入中にエラーが発生しました。' });
+    await res.status(500).json({ error: 'データの挿入中にエラーが発生しました。' });
+  } finally {
+    connection.end()
   }
 }

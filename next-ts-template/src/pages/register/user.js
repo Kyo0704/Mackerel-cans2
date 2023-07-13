@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import styles from "../../../styles/registerUser.module.scss"
 
-export default function index() {
+export default function Home() {
   const [liffObject, setLiffObject] = useState("");
   const [liffError, setLiffError] = useState("");
   const [liffToken, setLiffToken] = useState("");
