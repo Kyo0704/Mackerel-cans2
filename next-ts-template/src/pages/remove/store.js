@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react"
 import styles from "../../../styles/removeStore.module.scss"
 
+let fetchUserData
+let token
+let storeResult
+let optionId
+let selectedOption
+
 export default function Home() {
   const [liffObject, setLiffObject] = useState("");
   const [liffError, setLiffError] = useState("");
@@ -12,18 +18,12 @@ export default function Home() {
   const [isSelected, setIsSelected] = useState(false);
   const [removeError, setRemoveError] = useState(false)
 
-  let result
-  let token
-  let storeResult
-  let optionId
-  let selectedOption
-
   useEffect(() => {
     /************************************************************** */
     // テスト用に仮データを挿入　本番はすべてコードを消す
     // setLiffObject("kamikami");
     // token = "fake token";
-    // result = {
+    // fetchUserData = {
     //   "userId": "U0085669a8271dedff6046bcc45bfe915",
     //   "displayName": "リョウマ",
     //   "pictureUrl": "https://profile.line-scdn.net/abcdefghijklmn",
@@ -62,12 +62,12 @@ export default function Home() {
       },
       body: JSON.stringify({ data }),
     });
-    result = await response.json()
-    setUserData(result)
+    fetchUserData = await response.json()
+    setUserData(fetchUserData)
   }
 
   const getStoreData = async () => {
-    const data = { userId: result.userId }
+    const data = { userId: fetchUserData.userId }
     const response = await fetch('/api/getStoreData', {
       method: 'POST',
       headers: {
@@ -91,7 +91,7 @@ export default function Home() {
       });
 
       if (response.ok) {
-        const result = await response.json();
+        getStoreData()
       } else {
         setRemoveError(true)
         console.error('データの挿入中にエラーが発生しました。');
@@ -148,7 +148,7 @@ export default function Home() {
       )
     } else if (removeError == true) {
       return (
-        <div className={styles.title}>データベースに登録できませんでした。</div>
+        <div className={styles.title}>登録解除できませんでした。</div>
       )
     }
   }
@@ -163,6 +163,26 @@ export default function Home() {
     }
   }
 
+  const Display_registerStore = () => {
+    if (storeData) {
+      return (
+        <div className={styles.registerStore}>
+          <div>現在登録されている店舗</div>
+          {storeData.data.map((store) => (
+            <div key = {store.sid}>・{store.sname}</div>
+          ))}
+          <button onClick={getStoreData} className={styles.button}>更新</button>
+        </div>
+      )
+    } else {
+      return (
+        <div>
+          登録データを取得できません。
+        </div>
+      )
+    }
+  }
+
   const Display = () => {
     if (liffObject && liffToken) {
       if (storeData) {
@@ -170,6 +190,7 @@ export default function Home() {
           <div className={styles.title}>
             <Display_select />
             <Display_BackButton />
+            <Display_registerStore />
           </div>
         )
       } else {

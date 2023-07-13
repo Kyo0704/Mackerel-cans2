@@ -16,7 +16,7 @@ export default function Home() {
     /************************************************************** */
     // テスト用に仮データを挿入　本番はすべてコードを消す
     // setLiffObject("kamikami");
-    // setLiffToken("fake token");
+    // token = "fake token"
     // result = {
     //   "userId": "U0085669a8271dedff6046bcc45bfe915",
     //   "displayName": "リョウマ",
