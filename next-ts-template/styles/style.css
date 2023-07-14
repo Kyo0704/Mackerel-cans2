@@ -1,0 +1,18 @@
+main {
+    width: 800px;
+    margin: 0 auto;
+  }
+  
+  h1 {
+    text-align: center;
+  }
+  
+  li {
+    margin-bottom: 10px;
+    font-size: 20px;
+    line-height: 1.5;
+  }
+  
+  li:nth-child(odd) {
+    color: #777;
+  }
