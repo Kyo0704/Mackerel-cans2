@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ProductType } from '../../type';
 
@@ -18,7 +18,7 @@ export default function Product() {
     };
 
     fetchData();
-  },);
+  }, []);
 
   const toggleDiscounted = () => {
     if (showDiscounted) {
@@ -59,9 +59,9 @@ export default function Product() {
               <p className="text-gray-400">容量:{product.volume}</p>
             </div>
             <div className="p-4">
-              <Link href={``} className="text-base font-semibold text-lime-600 hover:text-lime-500">
-                詳細を見る
-              </Link>
+                <a className="text-base font-semibold text-lime-600 hover:text-lime-500">
+                  詳細を見る
+                </a>
             </div>
           </div>
         ))}
